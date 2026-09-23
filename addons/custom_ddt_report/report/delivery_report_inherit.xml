@@ -44,17 +44,26 @@
         <!-- Replace the "Delivered" column with "Net Weight" (picking not yet validated) -->
         <xpath expr="//table[@name='stock_move_table']/thead/tr/th[@name='th_sm_quantity']" position="replace">
             <th name="th_sm_quantity" class="text-end"><strong>Net Weight</strong></th>
+            <th name="th_sm_gross_weight" class="text-end"><strong>Gross Weight</strong></th>
         </xpath>
         <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[@class='o_td_quantity text-end'][2]" position="replace">
             <td class="text-end">
                 <span t-esc="'%.2f' % (move.product_id.weight * move.product_uom_qty)"/>
                 <span t-esc="move.product_id.weight_uom_name"/>
             </td>
+            <td class="text-end" name="td_sm_gross_weight">
+                <t t-set="move_package" t-value="move.move_line_ids.mapped('result_package_id')"/>
+                <t t-if="len(move_package) == 1">
+                    <span t-esc="'%.2f' % (move_package.shipping_weight or move_package.weight)"/>
+                    <span t-esc="move_package.weight_uom_name"/>
+                </t>
+            </td>
         </xpath>
 
         <!-- Replace the "Delivered" column with "Net Weight" (picking validated) -->
         <xpath expr="//table[@name='stock_move_line_table']/thead/tr/th[@name='th_sml_quantity']" position="replace">
             <th name="th_sml_quantity" class="text-center">Net Weight</th>
+            <th name="th_sml_gross_weight" class="text-center">Gross Weight</th>
         </xpath>
     </template>
 
@@ -65,6 +74,14 @@
                 <span t-esc="move_line.product_id.weight_uom_name"/>
             </td>
         </xpath>
+        <xpath expr="//td[@name='move_line_lot_quantity']" position="after">
+            <td class="text-center" name="move_line_gross_weight">
+                <t t-if="move_line.result_package_id">
+                    <span t-esc="'%.2f' % (move_line.result_package_id.shipping_weight or move_line.result_package_id.weight)"/>
+                    <span t-esc="move_line.result_package_id.weight_uom_name"/>
+                </t>
+            </td>
+        </xpath>
     </template>
 
     <template id="stock_report_delivery_aggregated_move_lines_net_weight" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
@@ -73,6 +90,14 @@
                 <t t-if="aggregated_lines[line]['quantity']">
                     <span t-esc="'%.2f' % (aggregated_lines[line]['product'].weight * aggregated_lines[line]['quantity'])"/>
                     <span t-esc="aggregated_lines[line]['product'].weight_uom_name"/>
+                </t>
+            </td>
+        </xpath>
+        <xpath expr="//td[@name='move_line_aggregated_quantity']" position="after">
+            <td class="text-center" name="move_line_aggregated_gross_weight">
+                <t t-if="aggregated_lines[line]['result_package_id']">
+                    <span t-esc="'%.2f' % (aggregated_lines[line]['result_package_id'].shipping_weight or aggregated_lines[line]['result_package_id'].weight)"/>
+                    <span t-esc="aggregated_lines[line]['result_package_id'].weight_uom_name"/>
                 </t>
             </td>
         </xpath>
