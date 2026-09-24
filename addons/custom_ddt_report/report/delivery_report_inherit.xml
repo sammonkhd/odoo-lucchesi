@@ -84,6 +84,11 @@
         </xpath>
     </template>
 
+    <!-- Remove the package name header row since gross weight per package is already shown in the table -->
+    <template id="stock_report_delivery_package_section_line_no_name" inherit_id="stock.stock_report_delivery_package_section_line">
+        <xpath expr="//tr" position="replace"/>
+    </template>
+
     <template id="stock_report_delivery_aggregated_move_lines_net_weight" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
         <xpath expr="//td[@name='move_line_aggregated_quantity']" position="replace">
             <td class="text-center" name="move_line_aggregated_quantity">
